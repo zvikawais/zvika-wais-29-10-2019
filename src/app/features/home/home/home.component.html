@@ -1,0 +1,25 @@
+<div class="row text-center">
+    <div class="col">
+        <form>
+            <mat-form-field class="w-75">
+                <input type="search" placeholder="Type city name" matInput [formControl]="searchFormCtl"
+                    [matAutocomplete]="auto">
+                <mat-icon matSuffix>search</mat-icon>
+                <mat-autocomplete #auto="matAutocomplete">
+                    <mat-option *ngFor="let city of cities$ | async" [value]="city"
+                        (onSelectionChange)="citySelectionChanged(city.Key)">
+                        {{city.LocalizedName}}
+                    </mat-option>
+                </mat-autocomplete>
+            </mat-form-field>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <mat-card>
+            <p>{{currentWeather$ | async | json}}</p>
+        </mat-card>
+    </div>
+</div>
