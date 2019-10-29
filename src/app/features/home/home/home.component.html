@@ -1,4 +1,9 @@
-<div class="row text-center">
+<div class="toggle-unit">
+    <mat-slide-toggle color="primary">
+        <small> Show celsius unit</small>
+    </mat-slide-toggle>
+</div>
+<div class="row text-center pt-5">
     <div class="col">
         <form>
             <mat-form-field class="w-75">
@@ -15,8 +20,6 @@
         </form>
     </div>
 </div>
-
-
 <ng-container *ngIf="(currentWeather$ | async ) as currentWeather">
     <div class="row">
         <div class="col">

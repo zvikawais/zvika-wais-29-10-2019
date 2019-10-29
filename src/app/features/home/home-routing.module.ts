@@ -6,10 +6,12 @@ import { HomeComponent } from '../home/home/home.component';
 const routes: Routes = [
     {
         path: '',
+        data: { state: 'home' },
         component: HomeComponent,
     },
     {
         path: ':id',
+        data: { state: 'home' },
         component: HomeComponent
     }
 ];

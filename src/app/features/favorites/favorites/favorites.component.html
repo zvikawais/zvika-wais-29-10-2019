@@ -2,12 +2,15 @@
     <div class="col-6 col-md-3" *ngFor="let favorite of favorites$ | async">
         <a [routerLink]="[ '/home', favorite.LocationKey ]">
             <mat-card>
-
                 <strong class="d-block">{{favorite.Name}}</strong>
                 <P [innerHTML]="getTemperatureText(favorite)"></P>
                 <span class="mt-4">{{favorite.CurrentWeather}}</span>
-
             </mat-card>
         </a>
+    </div>
+    <div class="col mt-5 text-center" *ngIf="!(favorites$ | async).length">
+        <strong>You do not have any favorites yet... </strong> <i class="material-icons">
+            tag_faces
+        </i>
     </div>
 </div>

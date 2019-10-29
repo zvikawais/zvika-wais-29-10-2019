@@ -11,6 +11,7 @@ import { Favorite } from 'src/app/shared/models/favorite.model';
 import { ActivatedRoute } from '@angular/router';
 import { LocationResponse } from 'src/app/shared/models/location-response.model';
 
+
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',

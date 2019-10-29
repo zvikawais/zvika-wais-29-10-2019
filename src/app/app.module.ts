@@ -13,9 +13,8 @@ import { SharedModule } from './shared/shared.module';
   ],
   imports: [
     // angular
-    BrowserAnimationsModule,
     BrowserModule,
-
+    BrowserAnimationsModule,
     // core & shared
     CoreModule,
     SharedModule,

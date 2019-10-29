@@ -4,7 +4,6 @@ import {
     HttpInterceptor,
     HttpHandler,
     HttpRequest,
-    HttpErrorResponse
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
@@ -20,11 +19,17 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     ): Observable<HttpEvent<any>> {
         return next.handle(request).pipe(
             tap({
-                error: (err: any) => {
-                    if (err instanceof HttpErrorResponse) {
-                        const appErrorHandler = this.injector.get(ErrorHandler);
-                        appErrorHandler.handleError(err);
+                error: (exception: any) => {
+                    let message = '';
+                    if (exception.error instanceof ErrorEvent) {
+                        // client-side error
+                        message = `Error: ${exception.error.message}`;
+                    } else {
+                        // server-side error
+                        message = `Error Code: ${exception.status}\nMessage: ${exception.message}`;
                     }
+                    const appErrorHandler = this.injector.get(ErrorHandler);
+                    appErrorHandler.handleError({ message } as Error);
                 }
             })
         );

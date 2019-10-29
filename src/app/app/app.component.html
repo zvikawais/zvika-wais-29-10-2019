@@ -1,21 +1,21 @@
 <header>
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
 
-    <div class="collapse navbar-collapse">
+    <div class="navbar-collapse">
       <a class="navbar-brand" [routerLink]="[ '/home' ]">Welcome</a>
       <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
         <li class="nav-item">
-          <a mat-button color="primary" [routerLink]="[ '/home' ]" class="nav-link">Home</a>
+          <a mat-button color="primary" [routerLink]="[ '/home' ]" routerLinkActive= "active" class="nav-link">Home</a>
         </li>
         <li class="nav-item">
-          <a mat-button color="accent" [routerLink]="[ '/favorites' ]" class="nav-link">Favorites</a>
+          <a mat-button color="accent" [routerLink]="[ '/favorites' ]" routerLinkActive= "active" class="nav-link">Favorites</a>
         </li>
       </ul>
     </div>
   </nav>
 </header>
-<div class="container mt-5" role="main">
-  <router-outlet></router-outlet>
+<div class="container position-relative router-wrapper" [@rotateCubeToLeft]="getState(o)" [@rotateCubeToRight]="getState(o)"  role="main">
+  <router-outlet #o="outlet"></router-outlet>
 
 </div>
 
