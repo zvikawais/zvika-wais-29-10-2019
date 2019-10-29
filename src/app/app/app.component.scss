@@ -1,4 +1,12 @@
+.fill-remaining-space {
+  flex: 1 1 auto;
+}
 .active {
-  background-color: #3f51b5;
-  color: #fff !important;
+  border-bottom: 1px solid;
+}
+
+@media (max-width: 500px) {
+  .mat-toolbar-single-row {
+    min-height: 100px;
+  }
 }

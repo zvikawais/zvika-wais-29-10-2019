@@ -1,6 +1,6 @@
 <div class="toggle-unit">
-    <mat-slide-toggle color="primary">
-        <small> Show celsius unit</small>
+    <mat-slide-toggle color="primary" (toggleChange)="toggleUnitType()">
+        <small> Show fahrenheit unit</small>
     </mat-slide-toggle>
 </div>
 <div class="row text-center pt-5">
@@ -23,7 +23,7 @@
 <ng-container *ngIf="(currentWeather$ | async ) as currentWeather">
     <div class="row">
         <div class="col">
-            <mat-card>
+            <mat-card class="mx-3">
                 <div class="row" *ngIf="(selectedLocation$ | async ) as selectedLocation">
                     <div class="col-10">
                         <strong class="d-block">{{selectedLocation.LocalizedName}}</strong>

@@ -1,0 +1,19 @@
+@import "~@angular/material/theming";
+@include mat-core();
+
+// $weather-app-primary: mat-palette($mat-indigo);
+// $weather-app-accent: mat-palette($mat-pink, A200, A100, A400);
+// $weather-app-theme: mat-light-theme($weather-app-primary, $weather-app-accent);
+
+// // Include the default theme styles.
+// @include angular-material-theme($weather-app-theme);
+
+// Define an alternate dark theme.
+$dark-primary: mat-palette($mat-blue-grey);
+$dark-accent: mat-palette($mat-amber, A200, A100, A400);
+$dark-warn: mat-palette($mat-deep-orange);
+$dark-theme: mat-dark-theme($dark-primary, $dark-accent, $dark-warn);
+
+.dark-theme {
+  @include angular-material-theme($dark-theme);
+}

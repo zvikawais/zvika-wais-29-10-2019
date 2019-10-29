@@ -10,13 +10,13 @@ const routes: Routes = [
   {
     path: 'home',
     loadChildren: () =>
-      import('./features/home/home.module').then(m => m.HomeModule)
+      import('./features/home/home.module').then((m) => m.HomeModule)
   },
   {
     path: 'favorites',
     loadChildren: () =>
       import('./features/favorites/favorites.module').then(
-        m => m.FavoritesModule
+        (m) => m.FavoritesModule
       )
   },
   {
@@ -29,7 +29,6 @@ const routes: Routes = [
   // useHash supports github.io demo page.
   imports: [
     RouterModule.forRoot(routes, {
-      useHash: true,
       scrollPositionRestoration: 'enabled',
       preloadingStrategy: PreloadAllModules
     })

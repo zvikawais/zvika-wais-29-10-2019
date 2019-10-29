@@ -26,6 +26,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   selectedLocation$: Observable<LocationResponse>;
   nextDays$: Observable<NextDays>;
   selectedUnitType: 'fahrenheit' | 'celsius' = 'celsius';
+
   protected onDestroy$ = new Subject<void>();
 
   private get unitSymbole(): string {
@@ -52,6 +53,10 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.onDestroy$.next();
     this.onDestroy$.complete();
+  }
+
+  toggleUnitType() {
+    this.selectedUnitType = this.selectedUnitType === 'celsius' ? 'fahrenheit' : 'celsius';
   }
 
   citySelectionChanged(locationKey: string) {
@@ -97,14 +102,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     } as Favorite);
   }
 
-
-
   private registerEvents(valueChanges: Observable<string>) {
     valueChanges.pipe(
-      filter(search => !!search),
+      filter((search) => !!search),
       takeUntil(this.onDestroy$),
       debounceTime(1000),
-      tap(q => {
+      tap((q) => {
         this.homeService.fetchCities(q);
       }),
     ).subscribe();

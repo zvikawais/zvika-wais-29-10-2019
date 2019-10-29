@@ -2,7 +2,7 @@
   "extends": "tslint:recommended",
   "rules": {
     "array-type": false,
-    "arrow-parens": false,
+    "arrow-parens": true,
     "deprecation": {
       "severity": "warning"
     },
@@ -25,8 +25,8 @@
       true,
       "rxjs/Rx"
     ],
-    "interface-name": false,
-    "max-classes-per-file": false,
+    "interface-name": true,
+    "max-classes-per-file": true,
     "max-line-length": [
       true,
       140
@@ -60,7 +60,7 @@
     "no-non-null-assertion": true,
     "no-redundant-jsdoc": true,
     "no-switch-case-fall-through": true,
-    "no-var-requires": false,
+    "no-var-requires": true,
     "object-literal-key-quotes": [
       true,
       "as-needed"
@@ -68,10 +68,10 @@
     "object-literal-sort-keys": false,
     "ordered-imports": false,
     "quotemark": [
-      true,
+      false,
       "single"
     ],
-    "trailing-comma": false,
+    "trailing-comma": true,
     "no-conflicting-lifecycle": true,
     "no-host-metadata-property": true,
     "no-input-rename": true,

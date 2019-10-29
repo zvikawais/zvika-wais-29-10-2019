@@ -6,15 +6,31 @@ import { rotateCubeToLeft, rotateCubeToRight } from 'ngx-router-animations';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
   animations: [
     trigger('rotateCubeToLeft', [transition('home => favorites', useAnimation(rotateCubeToLeft))]),
     trigger('rotateCubeToRight', [transition('favorites => home', useAnimation(rotateCubeToRight))])
-  ]
+  ],
+  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  title = 'weather';
+
+  get containerClassList(): DOMTokenList {
+    return document.getElementsByTagName('body')[0].classList;
+  }
+
+  constructor() { }
+
   getState(outlet: RouterOutlet) {
     return outlet.activatedRouteData.state;
   }
+
+  toggleTheme(theme) {
+    if (this.containerClassList.contains(theme)) {
+      this.containerClassList.remove(theme);
+    } else {
+      this.containerClassList.add(theme);
+    }
+  }
 }
+
+

@@ -1,24 +1,22 @@
 <header>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
-
-    <div class="navbar-collapse">
-      <a class="navbar-brand" [routerLink]="[ '/home' ]">Welcome</a>
-      <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
-        <li class="nav-item">
-          <a mat-button color="primary" [routerLink]="[ '/home' ]" routerLinkActive= "active" class="nav-link">Home</a>
-        </li>
-        <li class="nav-item">
-          <a mat-button color="accent" [routerLink]="[ '/favorites' ]" routerLinkActive= "active" class="nav-link">Favorites</a>
-        </li>
-      </ul>
+  <mat-toolbar color="primary" class="flex-wrap">
+    <span>Weather Application</span>
+    <span class="fill-remaining-space"></span>
+    <div class="mr-md-5">
+      <mat-slide-toggle color="accent" (toggleChange)="toggleTheme('dark-theme')">
+        <small> Toggle theme</small>
+      </mat-slide-toggle>
     </div>
-  </nav>
+    <nav class="ml-auto">
+      <a mat-button color="accent" [routerLink]="[ '/home' ]" routerLinkActive="active">Home</a>
+      <a mat-button color="accent" [routerLink]="[ '/favorites' ]" routerLinkActive="active">Favorites</a>
+    </nav>
+  </mat-toolbar>
 </header>
-<div class="container position-relative router-wrapper" [@rotateCubeToLeft]="getState(o)" [@rotateCubeToRight]="getState(o)"  role="main">
+<div class="container router-wrapper" [@rotateCubeToLeft]="getState(o)" [@rotateCubeToRight]="getState(o)" role="main">
   <router-outlet #o="outlet"></router-outlet>
-
 </div>
-
-<footer>
-
+<footer class="pl-3">
+  <small>Powered by <a target="_blank" href="https://www.linkedin.com/in/zvika-wais-5b0334117">Zvika
+      Wais</a></small>
 </footer>
