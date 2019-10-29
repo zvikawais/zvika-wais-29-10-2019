@@ -6,6 +6,10 @@ import { HomeComponent } from '../home/home/home.component';
 const routes: Routes = [
     {
         path: '',
+        component: HomeComponent,
+    },
+    {
+        path: ':id',
         component: HomeComponent
     }
 ];
@@ -15,3 +19,4 @@ const routes: Routes = [
     exports: [RouterModule]
 })
 export class HomeRoutingModule { }
+

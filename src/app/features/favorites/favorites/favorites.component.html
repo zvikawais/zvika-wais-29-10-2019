@@ -1,1 +1,13 @@
-<p>favorites works!</p>
+<div class="row">
+    <div class="col-6 col-md-3" *ngFor="let favorite of favorites$ | async">
+        <a [routerLink]="[ '/home', favorite.LocationKey ]">
+            <mat-card>
+
+                <strong class="d-block">{{favorite.Name}}</strong>
+                <P [innerHTML]="getTemperatureText(favorite)"></P>
+                <span class="mt-4">{{favorite.CurrentWeather}}</span>
+
+            </mat-card>
+        </a>
+    </div>
+</div>

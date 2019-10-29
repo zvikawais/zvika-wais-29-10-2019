@@ -6,7 +6,7 @@
                     [matAutocomplete]="auto">
                 <mat-icon matSuffix>search</mat-icon>
                 <mat-autocomplete #auto="matAutocomplete">
-                    <mat-option *ngFor="let city of cities$ | async" [value]="city"
+                    <mat-option *ngFor="let city of cities$ | async" [value]="city.LocalizedName"
                         (onSelectionChange)="citySelectionChanged(city.Key)">
                         {{city.LocalizedName}}
                     </mat-option>
@@ -16,10 +16,41 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="col">
-        <mat-card>
-            <p>{{currentWeather$ | async | json}}</p>
-        </mat-card>
+
+<ng-container *ngIf="(currentWeather$ | async ) as currentWeather">
+    <div class="row">
+        <div class="col">
+            <mat-card>
+                <div class="row" *ngIf="(selectedLocation$ | async ) as selectedLocation">
+                    <div class="col-10">
+                        <strong class="d-block">{{selectedLocation.LocalizedName}}</strong>
+                        <span [innerHTML]="getTemperatureText(currentWeather)"></span>
+                    </div>
+                    <div class="col-2 text-right">
+                        <button mat-icon-button matTooltip="{{getFavoriteBtnToolTip(selectedLocation.Key)}}"
+                            class="fav-btn" [ngClass]="{'is-favorite': isFavorite(selectedLocation.Key)}"
+                            (click)="addRemoveFavorite(currentWeather,selectedLocation)">
+                            <mat-icon>favorite</mat-icon>
+                        </button>
+                    </div>
+                </div>
+                <!-- <p>{{currentWeather | json}}</p> -->
+                <h3 class="text-center">{{currentWeather.WeatherText}}</h3>
+
+                <ng-container *ngIf="(nextDays$ | async) as nextDays">
+                    <div class="row mt-5">
+                        <div class="col-6 col-md-2 mt-4 mt-md-0"
+                            *ngFor="let forecast of nextDays.DailyForecasts; let i = index">
+                            <mat-card>
+                                <strong class="d-block">{{getDayText(i)}}</strong>
+                                <span [innerHTML]="getRangeTemperatureText(forecast.Temperature)"></span>
+                            </mat-card>
+                        </div>
+                    </div>
+                </ng-container>
+            </mat-card>
+        </div>
     </div>
-</div>
+
+
+</ng-container>

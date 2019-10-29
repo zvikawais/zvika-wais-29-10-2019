@@ -21,6 +21,7 @@ export class RestApiService {
 
 
     get<T>(endPoint: string, resourceKey: string, params?: HttpParams): Observable<T> {
+
         let url = `${this.apiBaseUrl}${endPoint}?apikey=${environment.apiKey}`;
         if (params) {
             url += '&' + params as any;
@@ -28,7 +29,6 @@ export class RestApiService {
 
         if (localStorage[resourceKey]) {    // Only for preventing over 50 requests per day
             const cachedData = JSON.parse(localStorage[resourceKey]) as StorageItem<T>;
-
             const cachedItem = cachedData.Data.find(x => x.Name === url);
             if (cachedItem) {
                 return of(cachedItem.Value);
