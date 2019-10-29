@@ -25,3 +25,22 @@ Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protrac
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+
+## Deployment setup
+
+Run `git checkout -b gh-pages`
+Run `git push origin gh-pages`
+Run `npm install -g angular-cli-ghpages`
+Run `ng build --prod --base-href https://zvikawais.github.io/zvikawais/`
+Run `ngh --dir=dist/weather`
+
+Browse `https://zvikawais.github.io/`
+
+## Continues deployment 
+Run `ng build --prod`
+Run `ngh --dir=dist/weather`
+
+
+
+
+
