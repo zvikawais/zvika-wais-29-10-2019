@@ -3,7 +3,7 @@
         <a [routerLink]="[ '/home', favorite.LocationKey ]">
             <mat-card>
                 <strong class="d-block">{{favorite.Name}}</strong>
-                <P [innerHTML]="getTemperatureText(favorite)"></P>
+                <P>{{getTemperatureText(favorite, (selectedUnitType$ | async))}}</P>
                 <span class="mt-4">{{favorite.CurrentWeather}}</span>
             </mat-card>
         </a>

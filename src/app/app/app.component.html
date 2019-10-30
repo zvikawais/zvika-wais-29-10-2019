@@ -13,6 +13,8 @@
     </nav>
   </mat-toolbar>
 </header>
+<mat-progress-bar [hidden]="!(isLoading$ | async)" color="warn" mode="indeterminate"></mat-progress-bar>
+<div  [hidden]="(isLoading$ | async)" class="loader-placeholder"></div>
 <div class="container router-wrapper" [@rotateCubeToLeft]="getState(o)" [@rotateCubeToRight]="getState(o)" role="main">
   <router-outlet #o="outlet"></router-outlet>
 </div>

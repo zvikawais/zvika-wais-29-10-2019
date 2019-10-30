@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { HomeService } from '../services/home.service';
 import { Observable, Subject } from 'rxjs';
 import { filter, takeUntil, debounceTime, tap } from 'rxjs/operators';
@@ -10,6 +10,7 @@ import { FavoritesService } from '../../favorites/services/favorites.service';
 import { Favorite } from 'src/app/shared/models/favorite.model';
 import { ActivatedRoute } from '@angular/router';
 import { LocationResponse } from 'src/app/shared/models/location-response.model';
+import { TEL_AVIV_KEY, UnitType, CELSIUS, FAHRENHEIT } from 'src/app/shared/globals/globals';
 
 
 @Component({
@@ -19,19 +20,16 @@ import { LocationResponse } from 'src/app/shared/models/location-response.model'
 })
 export class HomeComponent implements OnInit, OnDestroy {
 
-  searchFormCtl = new FormControl();
+  searchForm: FormGroup;
   searchTextChanged$ = new Subject<string>();
   cities$: Observable<CityResponse[]>;
   currentWeather$: Observable<WeatherCondition>;
   selectedLocation$: Observable<LocationResponse>;
   nextDays$: Observable<NextDays>;
-  selectedUnitType: 'fahrenheit' | 'celsius' = 'celsius';
+  unitTypeEnum = UnitType;
+  selectedUnitType$: Observable<UnitType>;
 
   protected onDestroy$ = new Subject<void>();
-
-  private get unitSymbole(): string {
-    return this.selectedUnitType === 'celsius' ? ' &#x2103;' : ' &#8457;';
-  }
 
   constructor(
     private homeService: HomeService,
@@ -40,14 +38,19 @@ export class HomeComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
+    this.searchForm = new FormGroup({
+      searchQuery: new FormControl(null, [Validators.pattern('^[a-zA-Z]+$')]),
+    });
     this.cities$ = this.homeService.citiesSource$;
     this.selectedLocation$ = this.homeService.selectedLocationSource$;
     this.currentWeather$ = this.homeService.currentWeatherSource$;
     this.nextDays$ = this.homeService.nextDaysSource$;
-    this.registerEvents(this.searchFormCtl.valueChanges);
+    this.selectedUnitType$ = this.homeService.unitTypeSource$;
+    this.registerTypingEvent(this.searchForm.controls.searchQuery.valueChanges);
     if (this.activatedRoute.snapshot.paramMap.get('id')) {
       this.citySelectionChanged(this.activatedRoute.snapshot.paramMap.get('id'));
     }
+    this.locateUser();
   }
 
   ngOnDestroy() {
@@ -55,8 +58,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.onDestroy$.complete();
   }
 
-  toggleUnitType() {
-    this.selectedUnitType = this.selectedUnitType === 'celsius' ? 'fahrenheit' : 'celsius';
+  toggleUnitType(unitType: UnitType) {
+    this.homeService.toggleUnitType(unitType);
   }
 
   citySelectionChanged(locationKey: string) {
@@ -64,15 +67,16 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.homeService.fetchNextDays(locationKey);
   }
 
-  getTemperatureText(currentWeather: WeatherCondition): string {
-    return this.selectedUnitType === 'celsius' ?
-      currentWeather.Temperature.Metric.Value + this.unitSymbole :
-      currentWeather.Temperature.Imperial.Value + this.unitSymbole;
+  getTemperatureText(currentWeather: WeatherCondition, unitType: UnitType): string {
+    return unitType === UnitType.celsius ?
+      currentWeather.Temperature.Metric.Value + CELSIUS :
+      currentWeather.Temperature.Imperial.Value + FAHRENHEIT;
   }
 
-  getRangeTemperatureText(forecastTemperature: ForecastTemperature) {
-    return forecastTemperature.Minimum.Value + this.unitSymbole + ' - '
-      + forecastTemperature.Maximum.Value + this.unitSymbole;
+  getRangeTemperatureText(forecastTemperature: ForecastTemperature, unitType: UnitType) {
+    const temperature = forecastTemperature.Minimum.Value + ' - '
+      + forecastTemperature.Maximum.Value;
+    return unitType === UnitType.celsius ? temperature + CELSIUS : temperature + FAHRENHEIT;
   }
 
   getFavoriteBtnToolTip(locationKey: string) {
@@ -98,19 +102,33 @@ export class HomeComponent implements OnInit, OnDestroy {
       LocationKey: selectedCity.Key,
       Name: selectedCity.LocalizedName,
       Temperature: currentWeather.Temperature,
-      SelectedUnitType: this.selectedUnitType
     } as Favorite);
   }
 
-  private registerEvents(valueChanges: Observable<string>) {
+  private registerTypingEvent(valueChanges: Observable<string>) {
     valueChanges.pipe(
       filter((search) => !!search),
       takeUntil(this.onDestroy$),
-      debounceTime(1000),
+      debounceTime(200),
       tap((q) => {
-        this.homeService.fetchCities(q);
+        if (this.searchForm.valid && (q + '').trim()) {
+          this.homeService.fetchCities(q);
+        }
       }),
     ).subscribe();
   }
 
+  private locateUser() {
+    if (!navigator.geolocation) {
+      this.citySelectionChanged(TEL_AVIV_KEY);
+    } else {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+        this.homeService.getGeoposition(latitude + '', longitude + '');
+      }, () => {
+        this.citySelectionChanged(TEL_AVIV_KEY);
+      });
+    }
+  }
 }

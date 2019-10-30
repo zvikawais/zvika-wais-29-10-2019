@@ -1,13 +1,16 @@
 <div class="toggle-unit">
-    <mat-slide-toggle color="primary" (toggleChange)="toggleUnitType()">
-        <small> Show fahrenheit unit</small>
-    </mat-slide-toggle>
+    <ng-container *ngIf="(selectedUnitType$ | async) as selectedUnitType">
+        <mat-slide-toggle color="primary" (toggleChange)="toggleUnitType(selectedUnitType)"
+            [checked]="selectedUnitType === unitTypeEnum.celsius">
+            <small> Show celsius unit</small>
+        </mat-slide-toggle>
+    </ng-container>
 </div>
 <div class="row text-center pt-5">
     <div class="col">
-        <form>
+        <form [formGroup]="searchForm">
             <mat-form-field class="w-75">
-                <input type="search" placeholder="Type city name" matInput [formControl]="searchFormCtl"
+                <input type="search" placeholder="Type city name" matInput formControlName="searchQuery"
                     [matAutocomplete]="auto">
                 <mat-icon matSuffix>search</mat-icon>
                 <mat-autocomplete #auto="matAutocomplete">
@@ -16,18 +19,21 @@
                         {{city.LocalizedName}}
                     </mat-option>
                 </mat-autocomplete>
+                <mat-error *ngIf="searchForm.get('searchQuery').hasError('pattern')">Please type only english letters
+                </mat-error>
             </mat-form-field>
         </form>
+
     </div>
 </div>
 <ng-container *ngIf="(currentWeather$ | async ) as currentWeather">
-    <div class="row">
+    <div class="row mt-4">
         <div class="col">
             <mat-card class="mx-3">
                 <div class="row" *ngIf="(selectedLocation$ | async ) as selectedLocation">
                     <div class="col-10">
                         <strong class="d-block">{{selectedLocation.LocalizedName}}</strong>
-                        <span [innerHTML]="getTemperatureText(currentWeather)"></span>
+                        <span>{{getTemperatureText(currentWeather, (selectedUnitType$ | async))}}</span>
                     </div>
                     <div class="col-2 text-right">
                         <button mat-icon-button matTooltip="{{getFavoriteBtnToolTip(selectedLocation.Key)}}"
@@ -37,16 +43,14 @@
                         </button>
                     </div>
                 </div>
-                <!-- <p>{{currentWeather | json}}</p> -->
                 <h3 class="text-center">{{currentWeather.WeatherText}}</h3>
-
                 <ng-container *ngIf="(nextDays$ | async) as nextDays">
                     <div class="row mt-5">
                         <div class="col-6 col-md-2 mt-4 mt-md-0"
                             *ngFor="let forecast of nextDays.DailyForecasts; let i = index">
                             <mat-card>
                                 <strong class="d-block">{{getDayText(i)}}</strong>
-                                <span [innerHTML]="getRangeTemperatureText(forecast.Temperature)"></span>
+                                <span>{{getRangeTemperatureText(forecast.Temperature, (selectedUnitType$ | async))}}</span>
                             </mat-card>
                         </div>
                     </div>

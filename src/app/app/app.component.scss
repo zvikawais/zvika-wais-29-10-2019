@@ -4,6 +4,9 @@
 .active {
   border-bottom: 1px solid;
 }
+.loader-placeholder {
+  height: 4px;
+}
 
 @media (max-width: 500px) {
   .mat-toolbar-single-row {

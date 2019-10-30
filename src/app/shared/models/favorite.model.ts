@@ -5,5 +5,4 @@ export interface Favorite {
     Name: string;
     CurrentWeather: string;
     Temperature: Temperature;
-    SelectedUnitType: 'fahrenheit' | 'celsius';
 }

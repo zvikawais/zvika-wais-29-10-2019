@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Favorite } from 'src/app/shared/models/favorite.model';
 import { FavoritesService } from '../services/favorites.service';
+import { UnitType, CELSIUS, FAHRENHEIT } from 'src/app/shared/globals/globals';
+import { HomeService } from '../../home/services/home.service';
 
 @Component({
   selector: 'app-favorites',
@@ -11,17 +13,22 @@ import { FavoritesService } from '../services/favorites.service';
 export class FavoritesComponent implements OnInit {
 
   favorites$: Observable<Favorite[]>;
+  selectedUnitType$: Observable<UnitType>;
 
-  constructor(private favoritesService: FavoritesService) { }
+  constructor(
+    private favoritesService: FavoritesService,
+    private homeService: HomeService
+  ) { }
 
   ngOnInit() {
     this.favorites$ = this.favoritesService.favoriteSource$;
+    this.selectedUnitType$ = this.homeService.unitTypeSource$;
     this.favoritesService.fetchFavorites();
   }
 
-  getTemperatureText(favorite: Favorite): string {
-    return favorite.SelectedUnitType === 'celsius' ?
-      favorite.Temperature.Metric.Value + ' &#x2103;' :
-      favorite.Temperature.Imperial.Value + ' &#8457;';
+  getTemperatureText(favorite: Favorite, unitType: UnitType) {
+    return unitType === UnitType.celsius ?
+      favorite.Temperature.Metric.Value + CELSIUS :
+      favorite.Temperature.Imperial.Value + FAHRENHEIT;
   }
 }

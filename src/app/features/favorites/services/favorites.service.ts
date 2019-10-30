@@ -6,7 +6,6 @@ import { Favorite } from 'src/app/shared/models/favorite.model';
 export class FavoritesService {
     constructor() { }
 
-
     public get favorites(): Favorite[] {
         return localStorage.favorites ? JSON.parse(localStorage.favorites) : [];
     }
@@ -20,26 +19,26 @@ export class FavoritesService {
 
     favoriteSource$ = this.favoriteSource.asObservable();
 
+
     fetchFavorites() {
         this.favoriteSource.next(this.favorites);
     }
 
     isFavorite(favoriteId: string): boolean {
-        const favorite = this.favorites.find(x => x.LocationKey === favoriteId);
+        const favorite = this.favorites.find((x) => x.LocationKey === favoriteId);
         return !!favorite;
     }
 
     addRemoveFavorite(favorite: Favorite) {
         if (this.isFavorite(favorite.LocationKey)) {
             this.removeFavorite(favorite.LocationKey);
-        }
-        else {
+        } else {
             this.addFavorite(favorite);
         }
     }
 
     private addFavorite(favorite: Favorite) {
-        if (!this.favorites.find(x => x.LocationKey === favorite.LocationKey)) {
+        if (!this.favorites.find((x) => x.LocationKey === favorite.LocationKey)) {
             const currentFavorites = this.favorites;
             currentFavorites.push(favorite);
             this.favorites = currentFavorites;
@@ -47,12 +46,11 @@ export class FavoritesService {
     }
 
     private removeFavorite(favoriteId: string) {
-        const favoriteIndex = this.favorites.findIndex(x => x.LocationKey === favoriteId);
+        const favoriteIndex = this.favorites.findIndex((x) => x.LocationKey === favoriteId);
         if (favoriteIndex > -1) {
             const currentFavorites = this.favorites;
             currentFavorites.splice(favoriteIndex, 1);
             this.favorites = currentFavorites;
         }
     }
-
 }

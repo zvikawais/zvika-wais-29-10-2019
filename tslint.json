@@ -25,7 +25,7 @@
       true,
       "rxjs/Rx"
     ],
-    "interface-name": true,
+    "interface-name": false,
     "max-classes-per-file": true,
     "max-line-length": [
       true,
