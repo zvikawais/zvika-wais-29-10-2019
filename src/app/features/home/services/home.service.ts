@@ -46,11 +46,31 @@ export class HomeService {
     fetchCurrentWeather(locationId: string) {
         this.setSelectedLocation(locationId);
         this.restApi.get<WeatherCondition[]>(this.endPoints.currentConditions + locationId, 'currentWeather')
-            .pipe(tap((x) => this.currentWeatherSource.next(x[0])))
+            .pipe(tap((x) => {
+                this.currentWeatherSource.next(x[0]);
+                this.fetchNextDays(locationId, this.unitTypeSource.value === UnitType.celsius);
+            }))
             .subscribe();
     }
 
-    fetchNextDays(locationId: string, withCelsiusUnit?: boolean) {
+    getGeoposition(lat: string, lon: string) {
+        this.restApi.get<GeoPositionResponse>(this.endPoints.geoposition, 'geoposition',
+            new HttpParams({ fromObject: { q: lat + ',' + lon } }))
+            .pipe(tap((x) => {
+                this.geoPositionSource.next(x);
+                this.fetchCurrentWeather(x.Key);
+            }))
+            .subscribe();
+    }
+
+    toggleUnitType() {
+        const lastUnitType = this.unitTypeSource.value;
+        this.unitTypeSource.next(lastUnitType === UnitType.celsius ? UnitType.fahrenheit : UnitType.celsius);
+        this.fetchNextDays(this.selectedLocationSource.value.Key, lastUnitType !== UnitType.celsius);
+    }
+
+
+    private fetchNextDays(locationId: string, withCelsiusUnit: boolean) {
         let httpParams: HttpParams;
         if (withCelsiusUnit) {
             httpParams = new HttpParams({ fromObject: { metric: "true" } });
@@ -60,17 +80,6 @@ export class HomeService {
             .subscribe();
     }
 
-    getGeoposition(lat: string, lon: string) {
-        this.restApi.get<GeoPositionResponse>(this.endPoints.geoposition, 'geoposition',
-            new HttpParams({ fromObject: { q: lat + ',' + lon } }))
-            .pipe(tap((x) => this.geoPositionSource.next(x)))
-            .subscribe();
-    }
-
-    toggleUnitType(lastUnitType: UnitType) {
-        this.unitTypeSource.next(lastUnitType === UnitType.celsius ? UnitType.fahrenheit : UnitType.celsius);
-        this.fetchNextDays(this.selectedLocationSource.value.Key, lastUnitType === UnitType.celsius);
-    }
 
     private setSelectedLocation(locationId: string) {
         this.restApi.get<LocationResponse>(this.endPoints.location + locationId, 'locations')

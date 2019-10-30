@@ -14,11 +14,7 @@
   </mat-toolbar>
 </header>
 <mat-progress-bar [hidden]="!(isLoading$ | async)" color="warn" mode="indeterminate"></mat-progress-bar>
-<div  [hidden]="(isLoading$ | async)" class="loader-placeholder"></div>
+<div [hidden]="(isLoading$ | async)" class="loader-placeholder"></div>
 <div class="container router-wrapper" [@rotateCubeToLeft]="getState(o)" [@rotateCubeToRight]="getState(o)" role="main">
   <router-outlet #o="outlet"></router-outlet>
 </div>
-<footer class="pl-3">
-  <small>Powered by <a target="_blank" href="https://www.linkedin.com/in/zvika-wais-5b0334117">Zvika
-      Wais</a></small>
-</footer>

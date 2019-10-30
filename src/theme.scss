@@ -1,14 +1,40 @@
 @import "~@angular/material/theming";
 @include mat-core();
 
-// $weather-app-primary: mat-palette($mat-indigo);
-// $weather-app-accent: mat-palette($mat-pink, A200, A100, A400);
-// $weather-app-theme: mat-light-theme($weather-app-primary, $weather-app-accent);
+@mixin theme-color-grabber($theme) {
+  $primary: map-get($theme, primary);
+  $accent: map-get($theme, accent);
+  $warn: map-get($theme, warn);
 
-// // Include the default theme styles.
-// @include angular-material-theme($weather-app-theme);
+  .error-notification-overlay {
+    color: mat-color($warn, default-contrast);
+    background-color: mat-color($warn);
+  }
+  .info-notification-overlay {
+    color: mat-color($accent, default-contrast);
+    background-color: mat-color($accent);
+  }
 
-// Define an alternate dark theme.
+  .success-notification-overlay {
+    color: mat-color($primary, default-contrast);
+    background-color: mat-color($primary);
+  }
+
+  .warning-notification-overlay {
+    color: mat-color($warn, default-contrast);
+    background-color: mat-color($warn);
+  }
+}
+
+// Define the default theme (same as the example above).
+$weather-app-primary: mat-palette($mat-indigo);
+$weather-app-accent: mat-palette($mat-pink, A200, A100, A400);
+$weather-app-theme: mat-light-theme($weather-app-primary, $weather-app-accent);
+
+// Include the default theme styles.
+@include angular-material-theme($weather-app-theme);
+@include theme-color-grabber($weather-app-theme);
+
 $dark-primary: mat-palette($mat-blue-grey);
 $dark-accent: mat-palette($mat-amber, A200, A100, A400);
 $dark-warn: mat-palette($mat-deep-orange);
@@ -16,4 +42,5 @@ $dark-theme: mat-dark-theme($dark-primary, $dark-accent, $dark-warn);
 
 .dark-theme {
   @include angular-material-theme($dark-theme);
+  @include theme-color-grabber($dark-theme);
 }

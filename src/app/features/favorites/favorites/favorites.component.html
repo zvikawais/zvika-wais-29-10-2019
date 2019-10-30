@@ -1,6 +1,6 @@
 <div class="row p-3">
-    <div class="col-6 col-md-3" *ngFor="let favorite of favorites$ | async">
-        <a [routerLink]="[ '/home', favorite.LocationKey ]">
+    <div matRipple class="col-6 col-md-3" *ngFor="let favorite of favorites$ | async">
+        <a [routerLink]="[ '/home', favorite.LocationKey ]" class="py-1">
             <mat-card>
                 <strong class="d-block">{{favorite.Name}}</strong>
                 <P>{{getTemperatureText(favorite, (selectedUnitType$ | async))}}</P>

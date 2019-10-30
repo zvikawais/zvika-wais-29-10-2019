@@ -39,7 +39,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.searchForm = new FormGroup({
-      searchQuery: new FormControl(null, [Validators.pattern('^[a-zA-Z]+$')]),
+      searchQuery: new FormControl(null, [Validators.pattern('^[a-zA-Z ]+$')]),
     });
     this.cities$ = this.homeService.citiesSource$;
     this.selectedLocation$ = this.homeService.selectedLocationSource$;
@@ -49,8 +49,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.registerTypingEvent(this.searchForm.controls.searchQuery.valueChanges);
     if (this.activatedRoute.snapshot.paramMap.get('id')) {
       this.citySelectionChanged(this.activatedRoute.snapshot.paramMap.get('id'));
+    } else {
+      this.locateUser();
     }
-    this.locateUser();
   }
 
   ngOnDestroy() {
@@ -58,13 +59,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.onDestroy$.complete();
   }
 
-  toggleUnitType(unitType: UnitType) {
-    this.homeService.toggleUnitType(unitType);
+  toggleUnitType() {
+    this.homeService.toggleUnitType();
   }
 
   citySelectionChanged(locationKey: string) {
     this.homeService.fetchCurrentWeather(locationKey);
-    this.homeService.fetchNextDays(locationKey);
   }
 
   getTemperatureText(currentWeather: WeatherCondition, unitType: UnitType): string {

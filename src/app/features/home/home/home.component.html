@@ -1,6 +1,6 @@
 <div class="toggle-unit">
     <ng-container *ngIf="(selectedUnitType$ | async) as selectedUnitType">
-        <mat-slide-toggle color="primary" (toggleChange)="toggleUnitType(selectedUnitType)"
+        <mat-slide-toggle color="primary" (toggleChange)="toggleUnitType()"
             [checked]="selectedUnitType === unitTypeEnum.celsius">
             <small> Show celsius unit</small>
         </mat-slide-toggle>
@@ -27,37 +27,33 @@
     </div>
 </div>
 <ng-container *ngIf="(currentWeather$ | async ) as currentWeather">
-    <div class="row mt-4">
-        <div class="col">
-            <mat-card class="mx-3">
-                <div class="row" *ngIf="(selectedLocation$ | async ) as selectedLocation">
-                    <div class="col-10">
-                        <strong class="d-block">{{selectedLocation.LocalizedName}}</strong>
-                        <span>{{getTemperatureText(currentWeather, (selectedUnitType$ | async))}}</span>
-                    </div>
-                    <div class="col-2 text-right">
-                        <button mat-icon-button matTooltip="{{getFavoriteBtnToolTip(selectedLocation.Key)}}"
-                            class="fav-btn" [ngClass]="{'is-favorite': isFavorite(selectedLocation.Key)}"
-                            (click)="addRemoveFavorite(currentWeather,selectedLocation)">
-                            <mat-icon>favorite</mat-icon>
-                        </button>
+    <div class="mt-md-4">
+        <mat-card class="mx-3">
+            <div class="row" *ngIf="(selectedLocation$ | async ) as selectedLocation">
+                <div class="col-10">
+                    <strong class="d-block">{{selectedLocation.LocalizedName}}</strong>
+                    <span>{{getTemperatureText(currentWeather, (selectedUnitType$ | async))}}</span>
+                </div>
+                <div class="col-2 text-right">
+                    <button mat-icon-button matTooltip="{{getFavoriteBtnToolTip(selectedLocation.Key)}}" class="fav-btn"
+                        [ngClass]="{'is-favorite': isFavorite(selectedLocation.Key)}"
+                        (click)="addRemoveFavorite(currentWeather,selectedLocation)">
+                        <mat-icon>favorite</mat-icon>
+                    </button>
+                </div>
+            </div>
+            <h3 class="text-center">{{currentWeather.WeatherText}}</h3>
+            <ng-container *ngIf="(nextDays$ | async) as nextDays">
+                <div class="row mt-md-5 mt-2">
+                    <div class="col-6 col-md-2 mt-4 mt-md-0"
+                        *ngFor="let forecast of nextDays.DailyForecasts; let i = index">
+                        <mat-card>
+                            <strong class="d-block">{{getDayText(i)}}</strong>
+                            <span>{{getRangeTemperatureText(forecast.Temperature, (selectedUnitType$ | async))}}</span>
+                        </mat-card>
                     </div>
                 </div>
-                <h3 class="text-center">{{currentWeather.WeatherText}}</h3>
-                <ng-container *ngIf="(nextDays$ | async) as nextDays">
-                    <div class="row mt-5">
-                        <div class="col-6 col-md-2 mt-4 mt-md-0"
-                            *ngFor="let forecast of nextDays.DailyForecasts; let i = index">
-                            <mat-card>
-                                <strong class="d-block">{{getDayText(i)}}</strong>
-                                <span>{{getRangeTemperatureText(forecast.Temperature, (selectedUnitType$ | async))}}</span>
-                            </mat-card>
-                        </div>
-                    </div>
-                </ng-container>
-            </mat-card>
-        </div>
+            </ng-container>
+        </mat-card>
     </div>
-
-
 </ng-container>
