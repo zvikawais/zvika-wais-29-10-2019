@@ -29,6 +29,7 @@ const routes: Routes = [
   // useHash supports github.io demo page.
   imports: [
     RouterModule.forRoot(routes, {
+      useHash: true,
       scrollPositionRestoration: 'enabled',
       preloadingStrategy: PreloadAllModules
     })
