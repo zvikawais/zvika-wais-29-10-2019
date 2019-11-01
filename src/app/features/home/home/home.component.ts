@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { HomeService } from '../services/home.service';
 import { Observable, Subject } from 'rxjs';
@@ -10,13 +10,14 @@ import { FavoritesService } from '../../favorites/services/favorites.service';
 import { Favorite } from 'src/app/shared/models/favorite.model';
 import { ActivatedRoute } from '@angular/router';
 import { LocationResponse } from 'src/app/shared/models/location-response.model';
-import { TEL_AVIV_KEY, UnitType, CELSIUS, FAHRENHEIT } from 'src/app/shared/globals/globals';
+import { TEL_AVIV_KEY, UnitType, CELSIUS, FAHRENHEIT, ENGLISH_LETTERS_REGEX } from 'src/app/shared/globals/globals';
 
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+  styleUrls: ['./home.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HomeComponent implements OnInit, OnDestroy {
 
@@ -39,19 +40,18 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.searchForm = new FormGroup({
-      searchQuery: new FormControl(null, [Validators.pattern('^[a-zA-Z ]+$')]),
+      searchQuery: new FormControl(null, [Validators.pattern(ENGLISH_LETTERS_REGEX)]),
     });
+
     this.cities$ = this.homeService.citiesSource$;
     this.selectedLocation$ = this.homeService.selectedLocationSource$;
     this.currentWeather$ = this.homeService.currentWeatherSource$;
     this.nextDays$ = this.homeService.nextDaysSource$;
     this.selectedUnitType$ = this.homeService.unitTypeSource$;
+
     this.registerTypingEvent(this.searchForm.controls.searchQuery.valueChanges);
-    if (this.activatedRoute.snapshot.paramMap.get('id')) {
-      this.citySelectionChanged(this.activatedRoute.snapshot.paramMap.get('id'));
-    } else {
-      this.locateUser();
-    }
+    this.initializeCIty();
+
   }
 
   ngOnDestroy() {
@@ -61,6 +61,14 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   toggleUnitType() {
     this.homeService.toggleUnitType();
+  }
+
+  initializeCIty() {
+    if (this.activatedRoute.snapshot.paramMap.get('id')) {
+      this.citySelectionChanged(this.activatedRoute.snapshot.paramMap.get('id'));
+    } else {
+      this.locateUser();
+    }
   }
 
   citySelectionChanged(locationKey: string) {
@@ -73,23 +81,16 @@ export class HomeComponent implements OnInit, OnDestroy {
       currentWeather.Temperature.Imperial.Value + FAHRENHEIT;
   }
 
-  getRangeTemperatureText(forecastTemperature: ForecastTemperature, unitType: UnitType) {
+  getRangeTemperatureText(forecastTemperature: ForecastTemperature, unitType: UnitType): string {
     const temperature = forecastTemperature.Minimum.Value + ' - '
       + forecastTemperature.Maximum.Value;
     return unitType === UnitType.celsius ? temperature + CELSIUS : temperature + FAHRENHEIT;
   }
 
-  getFavoriteBtnToolTip(locationKey: string) {
-    return this.favoritesService.isFavorite(locationKey) ?
+  getFavoriteBtnToolTip(locationKey: string): string {
+    return this.isFavorite(locationKey) ?
       'Remove from your favorites' :
       'Add to your favorites';
-  }
-
-  getDayText(i: number) {
-    const today = new Date();
-    const forecastDay = new Date();
-    forecastDay.setDate(today.getDate() + i);
-    return forecastDay.toString().split(' ')[0];
   }
 
   isFavorite(locationKey: string) {
@@ -111,7 +112,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       takeUntil(this.onDestroy$),
       debounceTime(200),
       tap((q) => {
-        if (this.searchForm.valid && (q + '').trim()) {
+        if (this.searchForm.valid && q.trim()) {
           this.homeService.fetchCities(q);
         }
       }),

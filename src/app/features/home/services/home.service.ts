@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { RestApiService } from 'src/app/core/rest-api/rest-api.service';
 import { BehaviorSubject } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { tap, map } from 'rxjs/operators';
 import { CityResponse } from 'src/app/shared/models/city-response.model';
 import { WeatherCondition } from 'src/app/shared/models/weather-condition.model';
 import { NextDays } from 'src/app/shared/models/next-days.model';
@@ -9,6 +9,7 @@ import { LocationResponse } from 'src/app/shared/models/location-response.model'
 import { GeoPositionResponse } from 'src/app/shared/models/geo-position-response.model';
 import { UnitType } from 'src/app/shared/globals/globals';
 import { HttpParams } from '@angular/common/http';
+import { HomeDataStore } from '../home.data-store';
 
 
 @Injectable({ providedIn: 'root' })
@@ -30,24 +31,37 @@ export class HomeService {
     private geoPositionSource = new BehaviorSubject<GeoPositionResponse>(null);
     private unitTypeSource = new BehaviorSubject<UnitType>(UnitType.fahrenheit);
 
-    citiesSource$ = this.citiesSource.asObservable();
-    nextDaysSource$ = this.nextDaysSource.asObservable();
-    currentWeatherSource$ = this.currentWeatherSource.asObservable();
-    selectedLocationSource$ = this.selectedLocationSource.asObservable();
-    geoPositionSource$ = this.geoPositionSource.asObservable();
-    unitTypeSource$ = this.unitTypeSource.asObservable();
+    private dataStore: HomeDataStore = {
+        citiesSource: [],
+        currentWeatherSource: {} as WeatherCondition,
+        selectedLocationSource: {} as LocationResponse,
+        nextDaysSource: {} as NextDays,
+        geoPositionSource: {} as GeoPositionResponse,
+        unitTypeSource: {} as UnitType
+    };
+
+    readonly citiesSource$ = this.citiesSource.asObservable();
+    readonly nextDaysSource$ = this.nextDaysSource.asObservable();
+    readonly currentWeatherSource$ = this.currentWeatherSource.asObservable();
+    readonly selectedLocationSource$ = this.selectedLocationSource.asObservable();
+    readonly geoPositionSource$ = this.geoPositionSource.asObservable();
+    readonly unitTypeSource$ = this.unitTypeSource.asObservable();
 
     fetchCities(q: string) {
         this.restApi.get<CityResponse[]>(this.endPoints.cities, 'cities', new HttpParams({ fromObject: { q } }))
-            .pipe(tap((x) => this.citiesSource.next(x)))
+            .pipe(map((x) => {
+                this.dataStore.citiesSource = x;
+                this.citiesSource.next([...this.dataStore.citiesSource]);
+            }))
             .subscribe();
     }
 
     fetchCurrentWeather(locationId: string) {
         this.setSelectedLocation(locationId);
         this.restApi.get<WeatherCondition[]>(this.endPoints.currentConditions + locationId, 'currentWeather')
-            .pipe(tap((x) => {
-                this.currentWeatherSource.next(x[0]);
+            .pipe(map((x) => {
+                this.dataStore.currentWeatherSource = x[0];
+                this.currentWeatherSource.next({ ...this.dataStore.currentWeatherSource });
                 this.fetchNextDays(locationId, this.unitTypeSource.value === UnitType.celsius);
             }))
             .subscribe();
@@ -56,8 +70,9 @@ export class HomeService {
     getGeoposition(lat: string, lon: string) {
         this.restApi.get<GeoPositionResponse>(this.endPoints.geoposition, 'geoposition',
             new HttpParams({ fromObject: { q: lat + ',' + lon } }))
-            .pipe(tap((x) => {
-                this.geoPositionSource.next(x);
+            .pipe(map((x) => {
+                this.dataStore.geoPositionSource = x;
+                this.geoPositionSource.next({ ...this.dataStore.geoPositionSource });
                 this.fetchCurrentWeather(x.Key);
             }))
             .subscribe();
@@ -76,15 +91,19 @@ export class HomeService {
             httpParams = new HttpParams({ fromObject: { metric: "true" } });
         }
         this.restApi.get<NextDays>(this.endPoints.forecasts + locationId, 'forecasts', httpParams)
-            .pipe(tap((x) => this.nextDaysSource.next(x)))
+            .pipe(map((x) => {
+                this.dataStore.nextDaysSource = x;
+                this.nextDaysSource.next({ ...this.dataStore.nextDaysSource });
+            }))
             .subscribe();
     }
 
 
     private setSelectedLocation(locationId: string) {
         this.restApi.get<LocationResponse>(this.endPoints.location + locationId, 'locations')
-            .pipe(tap((x) => {
-                this.selectedLocationSource.next(x);
+            .pipe(map((x) => {
+                this.dataStore.selectedLocationSource = x;
+                this.selectedLocationSource.next({ ...this.dataStore.selectedLocationSource });
             }))
             .subscribe();
     }

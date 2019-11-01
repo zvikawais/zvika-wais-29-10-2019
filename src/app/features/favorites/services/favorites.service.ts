@@ -6,27 +6,24 @@ import { Favorite } from 'src/app/shared/models/favorite.model';
 export class FavoritesService {
     constructor() { }
 
-    public get favorites(): Favorite[] {
+    private get favorites(): Favorite[] {
         return localStorage.favorites ? JSON.parse(localStorage.favorites) : [];
     }
-    public set favorites(v: Favorite[]) {
+    private set favorites(v: Favorite[]) {
         localStorage.favorites = JSON.stringify(v);
         this.favoriteSource.next(this.favorites);
 
     }
 
     private favoriteSource = new BehaviorSubject<Favorite[]>([]);
-
-    favoriteSource$ = this.favoriteSource.asObservable();
-
+    readonly favoriteSource$ = this.favoriteSource.asObservable();
 
     fetchFavorites() {
         this.favoriteSource.next(this.favorites);
     }
 
     isFavorite(favoriteId: string): boolean {
-        const favorite = this.favorites.find((x) => x.LocationKey === favoriteId);
-        return !!favorite;
+        return this.favorites.some((x) => x.LocationKey === favoriteId);
     }
 
     addRemoveFavorite(favorite: Favorite) {

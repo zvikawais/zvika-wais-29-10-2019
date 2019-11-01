@@ -2,7 +2,7 @@
     <ng-container *ngIf="(selectedUnitType$ | async) as selectedUnitType">
         <mat-slide-toggle color="primary" (toggleChange)="toggleUnitType()"
             [checked]="selectedUnitType === unitTypeEnum.celsius">
-            <small> Show celsius unit</small>
+            <small>Toggle ℉/℃</small>
         </mat-slide-toggle>
     </ng-container>
 </div>
@@ -28,11 +28,18 @@
 </div>
 <ng-container *ngIf="(currentWeather$ | async ) as currentWeather">
     <div class="mt-md-4">
-        <mat-card class="mx-3">
+        <mat-card class="mx-3 pb-5">
             <div class="row" *ngIf="(selectedLocation$ | async ) as selectedLocation">
-                <div class="col-10">
-                    <strong class="d-block">{{selectedLocation.LocalizedName}}</strong>
-                    <span>{{getTemperatureText(currentWeather, (selectedUnitType$ | async))}}</span>
+                <div class="col-9 col-md-10 row no-gutters">
+                    <div class="col-4 col-md-1">
+                        <img class="img-fluid" src="/assets/weather-icons/{{currentWeather.WeatherIcon}}-s.png"
+                            alt="weather icon">
+                    </div>
+                    <div class="col-6">
+                        <strong class="d-block">{{selectedLocation.LocalizedName}}</strong>
+                        <span>{{getTemperatureText(currentWeather, (selectedUnitType$ | async))}}</span>
+                    </div>
+
                 </div>
                 <div class="col-2 text-right">
                     <button mat-icon-button matTooltip="{{getFavoriteBtnToolTip(selectedLocation.Key)}}" class="fav-btn"
@@ -42,14 +49,16 @@
                     </button>
                 </div>
             </div>
-            <h3 class="text-center">{{currentWeather.WeatherText}}</h3>
+            <h3 class="text-center py-4">{{currentWeather.WeatherText}}</h3>
+
             <ng-container *ngIf="(nextDays$ | async) as nextDays">
-                <div class="row mt-md-5 mt-2">
-                    <div class="col-6 col-md-2 mt-4 mt-md-0"
-                        *ngFor="let forecast of nextDays.DailyForecasts; let i = index">
+                <div class="row mt-md-5 mt-2 justify-content-around">
+                    <div class="col-6 col-md-2 mt-4 mt-md-0" *ngFor="let forecast of nextDays.DailyForecasts">
                         <mat-card>
-                            <strong class="d-block">{{getDayText(i)}}</strong>
+                            <strong class="d-block">{{forecast.Date | date: 'EEE'}}</strong>
                             <span>{{getRangeTemperatureText(forecast.Temperature, (selectedUnitType$ | async))}}</span>
+                            <img class="img-fluid" src="/assets/weather-icons/{{forecast.Day.Icon}}-s.png"
+                                alt="weather icon">
                         </mat-card>
                     </div>
                 </div>

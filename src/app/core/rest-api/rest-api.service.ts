@@ -4,7 +4,7 @@ import { Observable, of } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { LoaderService } from '../loader/loader.service';
-import { StorageItem } from 'src/app/shared/models/storage-item.model';
+import { CachingService } from '../caching-service/caching.service';
 
 @Injectable({
     providedIn: 'root'
@@ -16,11 +16,12 @@ export class RestApiService {
 
     constructor(
         private httpClient: HttpClient,
+        private cachingService: CachingService,
         private loaderService: LoaderService
     ) { }
 
 
-    get<T>(endPoint: string, resourceKey: string, params?: HttpParams): Observable<T> {
+    get<T>(endPoint: string, resourceName: string, params?: HttpParams): Observable<T> {
 
         let url = `${this.apiBaseUrl}${endPoint}?apikey=${environment.apiKey}`;
 
@@ -28,29 +29,24 @@ export class RestApiService {
             url += '&' + params as any;
         }
 
-        if (localStorage[resourceKey]) {    // Only for preventing over 50 requests per day
-            const cachedData = JSON.parse(localStorage[resourceKey]) as StorageItem<T>;
-            const cachedItem = cachedData.Data.find((x) => x.Name === url);
+        if (this.cachingService.isResourceExists(resourceName)) {    // Only for preventing over 50 requests per day
+
+            const cachedItem = this.cachingService.get<T>(resourceName, url);
             if (cachedItem) {
-                return of(cachedItem.Value);
+                return of(cachedItem);
             }
         }
-        const request = this.httpClient.get<T>(url, { responseType: 'json' });
-        return this.execute(request, resourceKey, url);
+        const request = this.httpClient.get<T>(url);
+        return this.execute(request, resourceName, url);
     }
 
 
-    execute<T>(rq: Observable<T>, resourceKey: string, url: string): Observable<T> {
+    execute<T>(rq: Observable<T>, resourceName: string, url: string): Observable<T> {
         this.loaderService.toggleLoader(true);
         return rq.pipe(
             finalize(() => this.loaderService.toggleLoader(false)),
             tap((x) => {
-                if (!localStorage[resourceKey]) {
-                    localStorage[resourceKey] = JSON.stringify({ Data: [] } as StorageItem<T>);
-                }
-                const storageItem = JSON.parse(localStorage[resourceKey]) as StorageItem<T>;
-                storageItem.Data.push({ Name: url, Value: x });
-                localStorage[resourceKey] = JSON.stringify(storageItem);
+                this.cachingService.set(resourceName, url, x)
             }));
     }
 }
