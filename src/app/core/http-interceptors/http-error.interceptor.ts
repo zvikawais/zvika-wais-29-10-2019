@@ -4,14 +4,17 @@ import {
     HttpInterceptor,
     HttpHandler,
     HttpRequest,
+    HttpErrorResponse,
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { OVER_50_CALLS_MSG } from 'src/app/shared/globals/globals';
+import { AppErrorHandler } from '../error-handler/app-error-handler.service';
 
 /** Passes HttpErrorResponse to application-wide error handler */
 @Injectable()
 export class HttpErrorInterceptor implements HttpInterceptor {
-    constructor(private injector: Injector) { }
+    constructor(private errorHandler: AppErrorHandler) { }
 
     intercept(
         request: HttpRequest<any>,
@@ -20,16 +23,9 @@ export class HttpErrorInterceptor implements HttpInterceptor {
         return next.handle(request).pipe(
             tap({
                 error: (exception: any) => {
-                    let message = '';
-                    if (exception.error instanceof ErrorEvent) {
-                        // client-side error
-                        message = `Error: ${exception.error.message}`;
-                    } else {
-                        // server-side error
-                        message = `Error Code: ${exception.status}\nMessage: ${exception.message}`;
+                    if (exception instanceof HttpErrorResponse) {
+                        this.errorHandler.handleError(new Error(OVER_50_CALLS_MSG));
                     }
-                    const appErrorHandler = this.injector.get(ErrorHandler);
-                    appErrorHandler.handleError({ message } as Error);
                 }
             })
         );

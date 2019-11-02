@@ -12,41 +12,36 @@ export class NotificationService {
 
     default(message: string) {
         this.show(message, {
-            duration: 2000,
             panelClass: 'default-notification-overlay'
         });
     }
 
     info(message: string) {
         this.show(message, {
-            duration: 2000,
             panelClass: 'info-notification-overlay'
         });
     }
 
     success(message: string) {
         this.show(message, {
-            duration: 2000,
             panelClass: 'success-notification-overlay'
         });
     }
 
     warn(message: string) {
         this.show(message, {
-            duration: 2500,
             panelClass: 'warning-notification-overlay'
         });
     }
 
     error(message: string) {
         this.show(message, {
-            duration: 7000,
-            panelClass: 'error-notification-overlay'
+            panelClass: 'default-notification-overlay'
         });
     }
 
     private show(message: string, configuration: MatSnackBarConfig) {
         // Need to open snackBar from Angular zone to prevent issues with its position per
-        this.zone.run(() => this.snackBar.open(message, null, configuration));
+        this.zone.run(() => this.snackBar.open(message, 'dismiss', configuration));
     }
 }

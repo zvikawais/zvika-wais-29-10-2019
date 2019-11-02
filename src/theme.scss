@@ -8,7 +8,7 @@
 
   .error-notification-overlay {
     color: mat-color($warn, default-contrast);
-    background-color: mat-color($warn);
+    background-color: mat-color($accent);
   }
   .info-notification-overlay {
     color: mat-color($accent, default-contrast);
@@ -21,8 +21,8 @@
   }
 
   .warning-notification-overlay {
-    color: mat-color($warn, default-contrast);
-    background-color: mat-color($warn);
+    color: mat-color($accent, default-contrast);
+    background-color: mat-color($accent);
   }
 }
 

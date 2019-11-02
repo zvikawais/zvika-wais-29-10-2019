@@ -18,8 +18,7 @@ export {
     ],
     declarations: [],
     providers: [
-        { provide: HTTP_INTERCEPTORS, useClass: HttpErrorInterceptor, multi: true },
-        { provide: ErrorHandler, useClass: AppErrorHandler },
+        { provide: HTTP_INTERCEPTORS, useClass: HttpErrorInterceptor, multi: true }
     ],
 })
 export class CoreModule {

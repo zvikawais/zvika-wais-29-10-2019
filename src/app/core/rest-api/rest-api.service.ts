@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { finalize, tap } from 'rxjs/operators';
+import { Observable, of, throwError } from 'rxjs';
+import { finalize, tap, catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { LoaderService } from '../loader/loader.service';
 import { CachingService } from '../caching-service/caching.service';
+import { mockData } from 'src/app/features/home/mocks/data.mock';
 
 @Injectable({
     providedIn: 'root'
@@ -21,7 +22,11 @@ export class RestApiService {
     ) { }
 
 
-    get<T>(endPoint: string, resourceName: string, params?: HttpParams): Observable<T> {
+    get<T>(endPoint: string, resourceName: string, params?: HttpParams, useDemo = false): Observable<T> {
+
+        if (useDemo) {
+            return of(mockData[resourceName]);
+        }
 
         let url = `${this.apiBaseUrl}${endPoint}?apikey=${environment.apiKey}`;
 
@@ -29,7 +34,7 @@ export class RestApiService {
             url += '&' + params as any;
         }
 
-        if (this.cachingService.isResourceExists(resourceName)) {    // Only for preventing over 50 requests per day
+        if (this.cachingService.isItemExists(resourceName, url)) {    // Only for preventing over 50 requests per day
 
             const cachedItem = this.cachingService.get<T>(resourceName, url);
             if (cachedItem) {
@@ -45,8 +50,14 @@ export class RestApiService {
         this.loaderService.toggleLoader(true);
         return rq.pipe(
             finalize(() => this.loaderService.toggleLoader(false)),
+            catchError((e) => {
+                if (mockData[resourceName]) {
+                    return this.get<T>(url, resourceName, null, true);
+                }
+                return throwError(e);
+            }),
             tap((x) => {
-                this.cachingService.set(resourceName, url, x)
+                this.cachingService.set(resourceName, url, x);
             }));
     }
 }

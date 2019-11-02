@@ -12,7 +12,6 @@ export class FavoritesService {
     private set favorites(v: Favorite[]) {
         localStorage.favorites = JSON.stringify(v);
         this.favoriteSource.next(this.favorites);
-
     }
 
     private favoriteSource = new BehaviorSubject<Favorite[]>([]);
@@ -35,7 +34,7 @@ export class FavoritesService {
     }
 
     private addFavorite(favorite: Favorite) {
-        if (!this.favorites.find((x) => x.LocationKey === favorite.LocationKey)) {
+        if (!this.favorites.some((x) => x.LocationKey === favorite.LocationKey)) {
             const currentFavorites = this.favorites;
             currentFavorites.push(favorite);
             this.favorites = currentFavorites;
@@ -47,7 +46,7 @@ export class FavoritesService {
         if (favoriteIndex > -1) {
             const currentFavorites = this.favorites;
             currentFavorites.splice(favoriteIndex, 1);
-            this.favorites = currentFavorites;
+            this.favorites = currentFavorites.splice(favoriteIndex, 1);
         }
     }
 }

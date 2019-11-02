@@ -29,7 +29,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   nextDays$: Observable<NextDays>;
   unitTypeEnum = UnitType;
   selectedUnitType$: Observable<UnitType>;
-
   protected onDestroy$ = new Subject<void>();
 
   constructor(
@@ -48,10 +47,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.currentWeather$ = this.homeService.currentWeatherSource$;
     this.nextDays$ = this.homeService.nextDaysSource$;
     this.selectedUnitType$ = this.homeService.unitTypeSource$;
-
     this.registerTypingEvent(this.searchForm.controls.searchQuery.valueChanges);
     this.initializeCIty();
-
   }
 
   ngOnDestroy() {

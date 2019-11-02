@@ -1,6 +1,6 @@
 
 
-export interface StorageItem<T> {
-    Key: string;
-    Data: { Name: string, Value: T }[];
+export interface StorageResource<T> {
+    ResourceName: string;
+    Data: { Key: string, Value: T, ExpirationDate: Date; }[];
 }
